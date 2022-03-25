@@ -1,7 +1,7 @@
 {
-  "name": "template-for-generator-templates",
-  "version": "0.0.1",
-  "description": "Template for generator templates to make it much easier to start writing your own generator template",
+  "name": "asyncapi-esp32-mqtt-template",
+  "version": "1.0.0",
+  "description": "Template for ESP32 MQTT client generator",
   "main": "index.js",
   "scripts": {
     "test": "npm run testTemplate && npm run testHooks && npm run testFilters && npm run testComponents",
@@ -17,84 +17,38 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/asyncapi/template-for-generator-templates.git"
+    "url": "git+https://github.com/Metatavu/asyncapi-esp32-mqtt.git"
   },
   "keywords": [
     "asyncapi",
     "generator",
     "template"
   ],
-  "author": "Lukasz Gornicki <lpgornicki@gmail.com> (https://github.com/derberg/)",
+  "author": "Antti Leppä <antti.leppa@metatavu.fi>",
   "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   },
   "bugs": {
-    "url": "https://github.com/asyncapi/template-for-generator-templates/issues"
+    "url": "https://github.com/Metatavu/asyncapi-esp32-mqtt/issues"
   },
-  "homepage": "https://github.com/asyncapi/template-for-generator-templates#readme",
+  "homepage": "https://github.com/Metatavu/asyncapi-esp32-mqtt#readme",
   "dependencies": {
     "@asyncapi/generator-filters": "^2.1.0",
     "@asyncapi/generator-hooks": "^0.1.0",
     "@asyncapi/generator-react-sdk": "^0.2.23",
-    "puppeteer": "^5.2.1"
-  },
-  "release": {
-    "branches": [
-      "master"
-    ],
-    "plugins": [
-      [
-        "@semantic-release/commit-analyzer",
-        {
-          "preset": "conventionalcommits"
-        }
-      ],
-      [
-        "@semantic-release/release-notes-generator",
-        {
-          "preset": "conventionalcommits"
-        }
-      ],
-      "@semantic-release/npm",
-      "@semantic-release/github"
-    ]
+    "lodash": "^4.17.21"
   },
   "generator": {
     "renderer": "react",
-    "parameters": {
-      "asyncapiFileDir": {
-        "description": "Custom location of the AsyncAPI file that you provided as an input in generation. By default it is located in the root of the output directory"
-      },
-      "pdf": {
-        "description": "Set to `true` to get index.pdf generated next to your index.html",
-        "default": false
-      },
-      "png": {
-        "description": "Set to `true` to get index.png generated next to your index.html",
-        "default": false
-      },
-      "svg": {
-        "description": "Set to `true` to get index.svg generated next to your index.html",
-        "default": false
-      },
-      "maxTextSize": {
-        "description": "It is possible that in case of an extremely large AsyncAPI document default mermaid recommended text size will not be enough. Then you need to explicitly make it larger",
-        "default": 50000
-      }
-    },
-    "nonRenderableFiles": [
-      "style.css",
-      "sample.gif"
-    ],
     "generator": ">=1.3.0 <2.0.0",
     "hooks": {
       "@asyncapi/generator-hooks": "createAsyncapiFile"
     }
   },
   "devDependencies": {
-    "@asyncapi/generator": "^1.8.25",
-    "@asyncapi/parser": "^1.12.0",
+    "@asyncapi/generator": "^1.9.0",
+    "@asyncapi/parser": "^1.14.1",
     "@babel/preset-env": "^7.15.8",
     "@babel/preset-react": "^7.14.5",
     "@semantic-release/commit-analyzer": "^8.0.1",
