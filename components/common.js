@@ -1,76 +1,60 @@
-/*
- * Below you can see how to create reusable chunks/components/helpers.
- * Check the files in the `template` folder to see how to import and use them within a template.
- */
+import { IndendedLine } from './indended-line';
 
-import { Indent, IndentationTypes, withIndendation } from '@asyncapi/generator-react-sdk';
-
-/*
-  * Each component has a `childrenContent` property.
-  * It is the processed children content of a component into a pure string. You can use it for compositions in your component.
-  * 
-  * Example:
-  * function CustomComponent({ childrenContent }) {
-  *   return `some text at the beginning: ${childrenContent}`
-  * }
-  * 
-  * function RootComponent() {
-  *   return (
-  *     <CustomComponent>
-  *       some text at the end.
-  *     </CustomComponent>
-  *   );
-  * }
-  * 
-  * then output from RootComponent will be `some text at the beginning: some text at the end.`.
-  */
-export function HTML({ childrenContent }) {
-  return `
-<!DOCTYPE html>
-<html lang="en">
-${childrenContent}
-</html>
-`;
-}
-
-/*
- * If you need indent content inside template you can use `withIndendation` function or wrap content between `Indent` component.
- * The mentioned helper and component can be imported from `@asyncapi/generator-react-sdk` package.
+/**
+ * Renders function
  * 
- * `withIndendation` function performs action on pure string, but `Indent` can wraps part of template.
- * You can see usage both cases below.
- * 
- * Also you can see how to create components using composition.
- * You can use another component with the given parameters for the given use-case.
+ * @param {object} options
+ * @returns rendered function
  */
-export function Head({ title, cssLinks = [] }) {
-  const links = cssLinks.map(link => `<link rel="stylesheet" href="${link}">\n`).join('');
+export const renderFunction = ({ description, name, body, parameters, returnType, headerOnly }) => {
+  const header = `${returnType} ${name}(${ parameters.map((parameter) => `${ parameter.type } ${ parameter.name }`).join(', ') })`;
 
-  const content = `
-<head>
-  <meta charset="utf-8">
-  <title>${title}</title>
-${withIndendation(links, 2, IndentationTypes.SPACES)}
-</head>  
-`;
+  if (headerOnly) {
+    return (
+      <IndendedLine size={0}>{ ` ${header}; ` }</IndendedLine>
+    );
+  }
+
+  const parameterDocs = parameters.map(parameter => {
+    return (
+      <IndendedLine size={2}>{ `@param ${parameter.name} ${parameter.description}` }</IndendedLine>
+    );
+  });
 
   return (
-    <Indent size={2} type={IndentationTypes.SPACES}>
-      {content}
-    </Indent>
+    <>
+      <IndendedLine size={0}>{ '' }</IndendedLine>
+      <IndendedLine size={0}>{ '/**' }</IndendedLine>
+      <IndendedLine size={2}>{ description }</IndendedLine>
+      <IndendedLine size={0}>{ '' }</IndendedLine>
+      { parameterDocs }
+      <IndendedLine size={0}>{ '**/' }</IndendedLine>
+      <IndendedLine size={0}>{ ` ${header} { ` }</IndendedLine>
+      <IndendedLine size={2}>{ body }</IndendedLine>
+      <IndendedLine size={0}>{ '}' }</IndendedLine>
+    </>
   );
-}
+};
 
-export function Body({ childrenContent }) {
-  const content = `
-<body>
-${withIndendation(childrenContent, 2, IndentationTypes.SPACES)}
-</body>
-`;
-
-  return (
-    <Indent size={2} type={IndentationTypes.SPACES}>
-      {content}
-    </Indent>
-  );
-}
+/**
+ * Returns c++ type for given AsyncApi type
+ * 
+ * @param {string} type type
+ * @returns c++ type
+ */
+export const getType = (type) => {
+  switch (type) {
+  case 'integer':
+    return 'int';
+  case 'number':
+    return 'double';
+  case 'boolean':
+    return 'bool';
+  case 'array':
+    return 'std::vector<std::string>';
+  case 'object':
+    return '';
+  case 'string':
+    return 'String';
+  }
+};
