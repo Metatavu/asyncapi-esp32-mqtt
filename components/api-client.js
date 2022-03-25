@@ -1,4 +1,5 @@
 import { ListPublish } from './list-publish';
+import { ListSubscribe } from './list-subscribe';
 import { Includes } from './includes';
 
 /**
@@ -14,6 +15,7 @@ export function ApiClient({ asyncapi }) {
     <>
       <Includes />
       <ListPublish channels={channels} headerOnly={ false }/>
+      <ListSubscribe channels={channels} headerOnly={ false }/>
     </>
   );
 }

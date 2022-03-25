@@ -7,7 +7,7 @@ import { IndendedLine } from './indended-line';
  * @returns rendered function
  */
 export const renderFunction = ({ description, name, body, parameters, returnType, headerOnly }) => {
-  const header = `${returnType} ${name}(${ parameters.map((parameter) => `${ parameter.type } ${ parameter.name }`).join(', ') })`;
+  const header = `${returnType} ${name}(${ parameters.map((parameter) => parameter.raw ? parameter.raw : `${ parameter.type } ${ parameter.name }`).join(', ') })`;
 
   if (headerOnly) {
     return (

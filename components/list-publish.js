@@ -9,9 +9,9 @@ import { Publish } from './publish';
 export function ListPublish({ channels, headerOnly }) {
   return Object.entries(channels)
     .filter(([_channelName, channel]) => channel.hasPublish())
-    .map(([_channelName, channel]) => {
+    .map(([channelName, channel]) => {
       return  (
-        <Publish channel={ channel } headerOnly={ headerOnly }/>
+        <Publish channelName={ channelName } channel={ channel } headerOnly={ headerOnly }/>
       );
     })
     .filter(Boolean);
