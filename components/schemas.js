@@ -14,7 +14,7 @@ export function Schemas({ asyncapi, headerOnly, modelsFilename }) {
 
   return (
     <>
-      { headerOnly ? null : <Includes includes={ includes }/> }
+      { headerOnly ? <IndendedLine size={ 0 }>{ '#pragma once' }</IndendedLine> : <Includes includes={ includes }/> }
       { Array.from(schemas).map(([schemaName, schema]) => {
         return (
           <>

@@ -11,7 +11,7 @@ export const renderFunction = ({ description, name, body, parameters, returnType
 
   if (headerOnly) {
     return (
-      <IndendedLine size={0}>{ ` ${header}; ` }</IndendedLine>
+      <IndendedLine size={0}>{ `${header};` }</IndendedLine>
     );
   }
 
