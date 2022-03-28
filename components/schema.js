@@ -9,10 +9,10 @@ import { getSchemaType, getPrimitiveType } from './common';
  * @param {object} props component props
  * @returns schema object
  */
-function SchemaObject({ schemaName, schema }) {
+function SchemaObject({ schemaName, schema, headerOnly }) {
   const json = schema.json();
   const className = _.upperFirst(_.camelCase(schemaName));
-  const { properties } =  json; // required, 
+  const { properties } = json;
 
   /**
    * Renders single property
@@ -36,7 +36,7 @@ function SchemaObject({ schemaName, schema }) {
    * 
    * @returns construtor
    */
-  const renderConstructor = () => {
+  const renderConstructor = (headerOnly) => {
     const construtorArguments = Object.keys(properties).map(propertyName => {
       const construtorProperty = properties[propertyName];
       const construtorType = getSchemaType(construtorProperty);
@@ -47,11 +47,19 @@ function SchemaObject({ schemaName, schema }) {
       return `this->${propertyName} = ${propertyName};`;
     });
 
+    if (headerOnly) {
+      return (
+        <>
+          <IndendedLine size={ 4 }>{ `${className}(${construtorArguments.join(' ')});` }</IndendedLine>
+        </>
+      );
+    }
+
     return (
       <>
-        <IndendedLine size={ 4 }>{ `${className}(${construtorArguments.join(' ')}) {` }</IndendedLine>
-        <IndendedLine size={ 6 }>{ `${construtorSetters}` }</IndendedLine>
-        <IndendedLine size={ 4 }>{ '}' }</IndendedLine>
+        <IndendedLine size={ 0 }>{ `${className}::${className}(${construtorArguments.join(' ')}) {` }</IndendedLine>
+        <IndendedLine size={ 2 }>{ `${construtorSetters}` }</IndendedLine>
+        <IndendedLine size={ 0 }>{ '}' }</IndendedLine>
         <IndendedLine size={ 0 }></IndendedLine>
       </>
     );
@@ -62,7 +70,7 @@ function SchemaObject({ schemaName, schema }) {
    * 
    * @returns from JSON function
    */
-  const renderFromJson = () => {
+  const renderFromJson = (headerOnly) => {
     const constructorArguments = Object.keys(properties).map(argument => `${argument}Param`);
 
     const assignRows = Object.keys(properties).map(propertyName => {
@@ -86,14 +94,22 @@ function SchemaObject({ schemaName, schema }) {
       );
     });
 
+    if (headerOnly) {
+      return (
+        <>
+          <IndendedLine size={ 4 }>{ `static ${className} fromJson(String json);` }</IndendedLine>
+        </>
+      );
+    }
+
     return (
       <>
-        <IndendedLine size={ 4 }>{ `static ${className} fromJson(String json) {` }</IndendedLine>
-        <IndendedLine size={ 6 }>{ 'StaticJsonDocument<4096> doc;' }</IndendedLine>
-        <IndendedLine size={ 6 }>{ 'deserializeJson(doc, json);' }</IndendedLine>
-        <IndendedLine size={ 6 }>{ assignRows }</IndendedLine>
-        <IndendedLine size={ 6 }>{ `return ${className}(${constructorArguments});` }</IndendedLine>
-        <IndendedLine size={ 4 }>{ '}' }</IndendedLine>
+        <IndendedLine size={ 0 }>{ `${className} ${className}::fromJson(String json) {` }</IndendedLine>
+        <IndendedLine size={ 2 }>{ 'StaticJsonDocument<4096> doc;' }</IndendedLine>
+        <IndendedLine size={ 2 }>{ 'deserializeJson(doc, json);' }</IndendedLine>
+        <IndendedLine size={ 2 }>{ assignRows }</IndendedLine>
+        <IndendedLine size={ 2 }>{ `return ${className}(${constructorArguments});` }</IndendedLine>
+        <IndendedLine size={ 0 }>{ '}' }</IndendedLine>
         <IndendedLine size={ 0 }></IndendedLine>
       </>
     );
@@ -104,7 +120,7 @@ function SchemaObject({ schemaName, schema }) {
    * 
    * @returns toJson method
    */
-  const renderToJson = () => {
+  const renderToJson = (headerOnly) => {
     const exportProperties = Object.keys(properties).map(propertyName => {
       const exportProperty = properties[propertyName];
 
@@ -112,40 +128,59 @@ function SchemaObject({ schemaName, schema }) {
         const exportItemType = getPrimitiveType(exportProperty.items.type);
         return (
           <>
-            <IndendedLine size={ 4 }>{ `JsonArray ${propertyName}Array = doc.to<JsonArray>();` }</IndendedLine>
-            <IndendedLine size={ 4 }>{ `for(${exportItemType} i : ${propertyName}) ${propertyName}Array.add(i);` }</IndendedLine>
-            <IndendedLine size={ 4 }>{ `doc["${propertyName}"] = ${propertyName}Array;` }</IndendedLine>
+            <IndendedLine size={ 2 }>{ `JsonArray ${propertyName}Array = doc.to<JsonArray>();` }</IndendedLine>
+            <IndendedLine size={ 2 }>{ `for(${exportItemType} i : ${propertyName}) ${propertyName}Array.add(i);` }</IndendedLine>
+            <IndendedLine size={ 2 }>{ `doc["${propertyName}"] = ${propertyName}Array;` }</IndendedLine>
           </>
         );
       }
       return ( 
-        <IndendedLine size={ 4 }>{ `doc["${propertyName}"] = ${propertyName};` }</IndendedLine>
+        <IndendedLine size={ 2 }>{ `doc["${propertyName}"] = ${propertyName};` }</IndendedLine>
       );
     });
 
+    if (headerOnly) {
+      return (
+        <>
+          <IndendedLine size={ 2 }>{ 'String toJson();' }</IndendedLine>
+        </>
+      );
+    }
+
     return (
       <>
-        <IndendedLine size={ 2 }>{ 'String toJson() {' }</IndendedLine>
-        <IndendedLine size={ 4 }>{ 'StaticJsonDocument<1024> doc;' }</IndendedLine>
+        <IndendedLine size={ 0 }>{ `String ${className}::toJson() {` }</IndendedLine>
+        <IndendedLine size={ 2 }>{ 'StaticJsonDocument<1024> doc;' }</IndendedLine>
         { exportProperties }
-        <IndendedLine size={ 4 }>{ 'char jsonBuffer[1024];' }</IndendedLine>
-        <IndendedLine size={ 4 }>{ 'serializeJson(doc, jsonBuffer);' }</IndendedLine>
-        <IndendedLine size={ 4 }>{ 'return jsonBuffer;' }</IndendedLine>
-        <IndendedLine size={ 2 }>{ '}' }</IndendedLine>
+        <IndendedLine size={ 2 }>{ 'char jsonBuffer[1024];' }</IndendedLine>
+        <IndendedLine size={ 2 }>{ 'serializeJson(doc, jsonBuffer);' }</IndendedLine>
+        <IndendedLine size={ 2 }>{ 'return jsonBuffer;' }</IndendedLine>
+        <IndendedLine size={ 0 }>{ '}' }</IndendedLine>
       </>
     );
   };
 
+  if (headerOnly) {
+    return (
+      <>
+        <IndendedLine size={ 0 }> { `class ${className} { ` } </IndendedLine>
+        <IndendedLine size={ 2 }> { 'public:' } </IndendedLine>
+        { Object.keys(properties).map(propertyName  => renderProperty(propertyName, properties[propertyName])) }
+        <IndendedLine size={ 0 }></IndendedLine>
+        { renderConstructor(headerOnly) }
+        { renderFromJson(headerOnly) }
+        <IndendedLine size={ 2 }> { renderToJson(headerOnly) } </IndendedLine>
+        <IndendedLine size={ 0 }> { '}; ' } </IndendedLine>
+      </>
+    );
+  }
+
   return (
     <>
-      <IndendedLine size={ 0 }> { `class ${className} { ` } </IndendedLine>
-      <IndendedLine size={ 2 }> { 'public:' } </IndendedLine>
-      { Object.keys(properties).map(propertyName  => renderProperty(propertyName, properties[propertyName])) }
       <IndendedLine size={ 0 }></IndendedLine>
-      { renderConstructor() }
-      { renderFromJson() }
-      <IndendedLine size={ 2 }> { renderToJson() } </IndendedLine>
-      <IndendedLine size={ 0 }> { '}; ' } </IndendedLine>
+      { renderConstructor(headerOnly) }
+      { renderFromJson(headerOnly) }
+      <IndendedLine size={ 0 }> { renderToJson(headerOnly) } </IndendedLine>
     </>
   );
 }
@@ -156,7 +191,11 @@ function SchemaObject({ schemaName, schema }) {
  * @param {object} props component props
  * @returns rendered string property
  */
-function SchemaString({ schemaName, schema }) {
+function SchemaString({ schemaName, schema, headerOnly }) {
+  if (!headerOnly) {
+    return null;
+  }
+
   const typeName = _.upperFirst(_.camelCase(schemaName));
   return (
     <IndendedLine size={ 0 }> { `typedef String ${typeName};` } </IndendedLine>
@@ -169,14 +208,14 @@ function SchemaString({ schemaName, schema }) {
  * @param {object} props component props
  * @returns rendered schema
  */
-export function Schema({ schemaName, schema }) {
+export function Schema({ schemaName, schema, headerOnly }) {
   const json = schema.json();
   
   switch (json.type) {
   case 'object':
-    return <SchemaObject schemaName={ schemaName } schema={ schema }/>;
+    return <SchemaObject schemaName={ schemaName } schema={ schema } headerOnly={ headerOnly }/>;
   case 'string':
-    return <SchemaString schemaName={ schemaName } schema={ schema }/>;
+    return <SchemaString schemaName={ schemaName } schema={ schema } headerOnly={ headerOnly }/>;
   default:
     console.error(`Unsupported schema type ${json.type}`);
   }

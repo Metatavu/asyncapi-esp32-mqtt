@@ -2,37 +2,44 @@ import { File } from '@asyncapi/generator-react-sdk';
 import { ApiClient } from '../components/api-client';
 import { ApiClientHeader } from '../components/api-client-header';
 import { Schemas } from '../components/schemas';
-import _ from 'lodash';
 
 export default function({ asyncapi, params }) {
   if (!asyncapi.hasComponents()) {
     return null;
   }
 
+  const includeSubscribe = false;
+  const includePublish = true;
   const includeModel = true;
-  const includeApi = false;
+  const includeApi = includeSubscribe || includePublish;
 
-  const apiName = asyncapi.info().title();
+  const clientFilename = 'client';
+  const modelsFilename = 'models';
   const results = [];
 
   if (includeModel) {
     results.push((
-      <File name={ 'model.cpp' }>
-        <Schemas asyncapi={ asyncapi } />
+      <File name={ `${modelsFilename}.cpp` }>
+        <Schemas asyncapi={ asyncapi } headerOnly={ false } modelsFilename={ modelsFilename }/>
+      </File>
+    ));
+    results.push((
+      <File name={ `${modelsFilename}.hpp` }>
+        <Schemas asyncapi={ asyncapi } headerOnly={ true }/>
       </File>
     ));
   }
 
   if (includeApi) {
     results.push((
-      <File name={ `${_.snakeCase(apiName)}.h` }>
-        <ApiClientHeader asyncapi={ asyncapi } />
+      <File name={ `${clientFilename}.hpp` }>
+        <ApiClientHeader asyncapi={ asyncapi } includeSubscribe={ includeSubscribe } includePublish={ includePublish }/>
       </File>
     ));
 
     results.push((
-      <File name={ `${_.snakeCase(apiName)}.cpp` }>
-        <ApiClient asyncapi={ asyncapi } />
+      <File name={ `${clientFilename}.cpp` }>
+        <ApiClient asyncapi={ asyncapi } includeSubscribe={ includeSubscribe } includePublish={ includePublish } modelsFilename={ modelsFilename }/>
       </File>
     ));
   }

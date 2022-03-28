@@ -7,13 +7,13 @@ import { ListSubscribe } from './list-subscribe';
  * @param {object} component props
  * @returns rendered api client header file contents
  */
-export function ApiClientHeader({ asyncapi }) {
+export function ApiClientHeader({ asyncapi, includeSubscribe, includePublish }) {
   const channels = asyncapi.channels();
 
   return (
     <>
-      <ListPublish channels={channels} headerOnly={ true }/>
-      <ListSubscribe channels={channels} headerOnly={ true }/>
+      { includeSubscribe ? <ListSubscribe channels={channels} headerOnly={ true }/> : null }
+      { includePublish ? <ListPublish channels={channels} headerOnly={ true }/> : null }
     </>
   );
 }

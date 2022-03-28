@@ -28,28 +28,10 @@ export function Publish({ channelName, channel, headerOnly }) {
    * @returns payload parameters as array
    */
   const getPayloadParameters = (payload) => {
-    return Object.entries(payload._json.properties).map(([name, parameter]) => {
-      return { type: getSchemaType(parameter), name: name, description: parameter.description };
-    });
-  };
-
-  /**
-   * Renders payload parameter as string
-   * 
-   * @param {object} parameter parameter
-   * @returns rendered parameter
-   */
-  const renderPayloadParameter = (parameter) => {
-    if (parameter.type === 'std::vector<std::string>') {
-      return `JsonArray ${parameter.name}Array = payloadDocument.to<JsonArray>();
-for (std::string i : ${parameter.name}) {
-  ${parameter.name}Array.add(i);
-};
-payloadDocument["${parameter.name}"] = ${parameter.name}Array;
-`;
-    }
-
-    return `payloadDocument["${parameter.name}"] = ${parameter.name};`;
+    const { _json } = payload;
+    const type = _json['x-parser-schema-id'];
+    const description = _json.description || 'body';
+    return [{ type: type, name: 'body', description: description }];
   };
 
   /**
@@ -76,12 +58,7 @@ payloadDocument["${parameter.name}"] = ${parameter.name}Array;
    */
   const renderBody = (channelParameters, payloadParameters) => {
     return `String topic = "/${renerTopic(channelParameters)}";
-StaticJsonDocument<200> payloadDocument;
-${ payloadParameters.map(renderPayloadParameter).join('\n') }
-char jsonBuffer[512];
-serializeJson(payloadDocument, jsonBuffer);
-Serial.println(jsonBuffer);
-client.publish(topic, jsonBuffer);`;
+client.publish(topic, body.toJson());`;
   };
 
   const publish = channel.publish();

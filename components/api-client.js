@@ -8,15 +8,15 @@ import { Includes } from './includes';
  * @param {object} component props
  * @returns rendered api client file contents
  */
-export function ApiClient({ asyncapi }) {
+export function ApiClient({ asyncapi, includeSubscribe, includePublish, modelsFilename }) {
   const channels = asyncapi.channels();
-  const includes = ['<vector>', '<string>', '<sstream>', '<iostream>', '<ArduinoJson.h>', '<MQTTClient.h>'];
+  const includes = ['<vector>', '<string>', '<sstream>', '<iostream>', '<ArduinoJson.h>', '<MQTTClient.h>', `"${modelsFilename}.hpp"`];
 
   return (
     <>
       <Includes includes={ includes }/>
-      <ListPublish channels={channels} headerOnly={ false }/>
-      <ListSubscribe channels={channels} headerOnly={ false }/>
+      { includeSubscribe ? <ListSubscribe channels={channels} headerOnly={ false }/> : null }
+      { includePublish ? <ListPublish channels={channels} headerOnly={ false }/> : null }
     </>
   );
 }
