@@ -25,7 +25,7 @@ export default function({ asyncapi, params }) {
     ));
     results.push((
       <File name={ `${modelsFilename}.hpp` }>
-        <Schemas asyncapi={ asyncapi } headerOnly={ true }/>
+        <Schemas asyncapi={ asyncapi } headerOnly={ true } modelsFilename={ modelsFilename }/>
       </File>
     ));
   }
@@ -33,7 +33,7 @@ export default function({ asyncapi, params }) {
   if (includeApi) {
     results.push((
       <File name={ `${clientFilename}.hpp` }>
-        <ApiClientHeader asyncapi={ asyncapi } includeSubscribe={ includeSubscribe } includePublish={ includePublish }/>
+        <ApiClientHeader asyncapi={ asyncapi } includeSubscribe={ includeSubscribe } includePublish={ includePublish } modelsFilename={ modelsFilename }/>
       </File>
     ));
 

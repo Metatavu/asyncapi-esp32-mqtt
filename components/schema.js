@@ -50,15 +50,15 @@ function SchemaObject({ schemaName, schema, headerOnly }) {
     if (headerOnly) {
       return (
         <>
-          <IndendedLine size={ 4 }>{ `${className}(${construtorArguments.join(' ')});` }</IndendedLine>
+          <IndendedLine size={ 4 }>{ `${className}(${construtorArguments.join(', ')});` }</IndendedLine>
         </>
       );
     }
 
     return (
       <>
-        <IndendedLine size={ 0 }>{ `${className}::${className}(${construtorArguments.join(' ')}) {` }</IndendedLine>
-        <IndendedLine size={ 2 }>{ `${construtorSetters}` }</IndendedLine>
+        <IndendedLine size={ 0 }>{ `${className}::${className}(${construtorArguments.join(', ')}) {` }</IndendedLine>
+        <IndendedLine size={ 2 }>{ `${construtorSetters.join('\n')}` }</IndendedLine>
         <IndendedLine size={ 0 }>{ '}' }</IndendedLine>
         <IndendedLine size={ 0 }></IndendedLine>
       </>
