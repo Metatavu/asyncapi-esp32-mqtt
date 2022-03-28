@@ -32,6 +32,74 @@ function SchemaObject({ schemaName, schema }) {
   };
 
   /**
+   * Renders construtor
+   * 
+   * @returns construtor
+   */
+  const renderConstructor = () => {
+    const construtorArguments = Object.keys(properties).map(propertyName => {
+      const construtorProperty = properties[propertyName];
+      const construtorType = getSchemaType(construtorProperty);
+      return `${construtorType} ${propertyName}`;
+    });
+
+    const construtorSetters = Object.keys(properties).map(propertyName => {
+      return `this->${propertyName} = ${propertyName};`;
+    });
+
+    return (
+      <>
+        <IndendedLine size={ 4 }>{ `${className}(${construtorArguments.join(' ')}) {` }</IndendedLine>
+        <IndendedLine size={ 6 }>{ `${construtorSetters}` }</IndendedLine>
+        <IndendedLine size={ 4 }>{ '}' }</IndendedLine>
+        <IndendedLine size={ 0 }></IndendedLine>
+      </>
+    );
+  };
+
+  /**
+   * Renders from JSON function
+   * 
+   * @returns from JSON function
+   */
+  const renderFromJson = () => {
+    const constructorArguments = Object.keys(properties).map(argument => `${argument}Param`);
+
+    const assignRows = Object.keys(properties).map(propertyName => {
+      const assignProperty = properties[propertyName];
+      const assignType = getSchemaType(assignProperty);
+
+      if (assignProperty.type === 'array') {
+        const assignItemType = getPrimitiveType(assignProperty.items.type);
+
+        return (
+          <>
+            <IndendedLine size={ 0 }>{ `JsonArray ${propertyName}Array = doc["${propertyName}"];` }</IndendedLine>
+            <IndendedLine size={ 0 }>{ `std::vector<${assignItemType}> ${propertyName}Param = std::vector<${assignItemType}>();` }</IndendedLine>
+            <IndendedLine size={ 0 }>{ `for (JsonVariant v : ${propertyName}Array) ${propertyName}Param.push_back(v.as<${assignItemType}>());` }</IndendedLine>
+          </>
+        );
+      }
+
+      return (
+        <IndendedLine size={ 0 }> { `${assignType} ${propertyName}Param = doc["${propertyName}"];` } </IndendedLine>
+      );
+    });
+
+    return (
+      <>
+        <IndendedLine size={ 4 }>{ `static ${className} fromJson(String json) {` }</IndendedLine>
+        <IndendedLine size={ 6 }>{ 'StaticJsonDocument<4096> doc;' }</IndendedLine>
+        <IndendedLine size={ 6 }>{ 'deserializeJson(doc, json);' }</IndendedLine>
+        <IndendedLine size={ 6 }>{ assignRows }</IndendedLine>
+        <IndendedLine size={ 6 }>{ `return ${className}(${constructorArguments});` }</IndendedLine>
+        <IndendedLine size={ 4 }>{ '}' }</IndendedLine>
+        <IndendedLine size={ 0 }></IndendedLine>
+      </>
+    );
+  };
+
+  /**
    * Renders toJson method
    * 
    * @returns toJson method
@@ -71,8 +139,11 @@ function SchemaObject({ schemaName, schema }) {
   return (
     <>
       <IndendedLine size={ 0 }> { `class ${className} { ` } </IndendedLine>
-      <IndendedLine size={ 2 }> { 'public:' } </IndendedLine>      
+      <IndendedLine size={ 2 }> { 'public:' } </IndendedLine>
       { Object.keys(properties).map(propertyName  => renderProperty(propertyName, properties[propertyName])) }
+      <IndendedLine size={ 0 }></IndendedLine>
+      { renderConstructor() }
+      { renderFromJson() }
       <IndendedLine size={ 2 }> { renderToJson() } </IndendedLine>
       <IndendedLine size={ 0 }> { '}; ' } </IndendedLine>
     </>

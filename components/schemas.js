@@ -1,5 +1,6 @@
 import { Includes } from './includes';
 import { Schema } from './schema';
+import { IndendedLine } from './indended-line';
 
 /**
  * Renders schemas file contents
@@ -16,7 +17,10 @@ export function Schemas({ asyncapi }) {
       <Includes includes={ includes }/>
       { Array.from(schemas).map(([schemaName, schema]) => {
         return (
-          <Schema schemaName={ schemaName } schema={ schema }/>
+          <>
+            <IndendedLine size={ 0 }></IndendedLine>
+            <Schema schemaName={ schemaName } schema={ schema }/>
+          </>
         );        
       }) }
     </>
