@@ -9,7 +9,7 @@ import { Indent, IndentationTypes } from '@asyncapi/generator-react-sdk';
  */
 export function IndendedLine({ size, children }) {
   if (Array.isArray(children)) {
-    children = children.filter(child => !!child.trim());
+    children = children.filter(child => typeof child !== 'string' || !!child.trim());
   }
 
   return (

@@ -1,7 +1,7 @@
 /* eslint-disable security/detect-object-injection */
 import { IndendedLine } from './indended-line';
 import _ from 'lodash';
-import { getSchemaType } from './common';
+import { getSchemaType, getPrimitiveType } from './common';
 
 /**
  * Renders schema object
@@ -31,11 +31,49 @@ function SchemaObject({ schemaName, schema }) {
     );
   };
 
+  /**
+   * Renders toJson method
+   * 
+   * @returns toJson method
+   */
+  const renderToJson = () => {
+    const exportProperties = Object.keys(properties).map(propertyName => {
+      const exportProperty = properties[propertyName];
+
+      if (exportProperty.type === 'array') {
+        const exportItemType = getPrimitiveType(exportProperty.items.type);
+        return (
+          <>
+            <IndendedLine size={ 4 }>{ `JsonArray ${propertyName}Array = doc.to<JsonArray>();` }</IndendedLine>
+            <IndendedLine size={ 4 }>{ `for(${exportItemType} i : ${propertyName}) ${propertyName}Array.add(i);` }</IndendedLine>
+            <IndendedLine size={ 4 }>{ `doc["${propertyName}"] = ${propertyName}Array;` }</IndendedLine>
+          </>
+        );
+      }
+      return ( 
+        <IndendedLine size={ 4 }>{ `doc["${propertyName}"] = ${propertyName};` }</IndendedLine>
+      );
+    });
+
+    return (
+      <>
+        <IndendedLine size={ 2 }>{ 'String toJson() {' }</IndendedLine>
+        <IndendedLine size={ 4 }>{ 'StaticJsonDocument<1024> doc;' }</IndendedLine>
+        { exportProperties }
+        <IndendedLine size={ 4 }>{ 'char jsonBuffer[1024];' }</IndendedLine>
+        <IndendedLine size={ 4 }>{ 'serializeJson(doc, jsonBuffer);' }</IndendedLine>
+        <IndendedLine size={ 4 }>{ 'return jsonBuffer;' }</IndendedLine>
+        <IndendedLine size={ 2 }>{ '}' }</IndendedLine>
+      </>
+    );
+  };
+
   return (
     <>
       <IndendedLine size={ 0 }> { `class ${className} { ` } </IndendedLine>
       <IndendedLine size={ 2 }> { 'public:' } </IndendedLine>      
       { Object.keys(properties).map(propertyName  => renderProperty(propertyName, properties[propertyName])) }
+      <IndendedLine size={ 2 }> { renderToJson() } </IndendedLine>
       <IndendedLine size={ 0 }> { '}; ' } </IndendedLine>
     </>
   );
