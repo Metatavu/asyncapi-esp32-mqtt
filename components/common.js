@@ -42,7 +42,7 @@ export const renderFunction = ({ description, name, body, parameters, returnType
  * @param {string} type type
  * @returns c++ type
  */
-export const getType = (type) => {
+export const getPrimitiveType = (type) => {
   switch (type) {
   case 'integer':
     return 'int';
@@ -50,11 +50,32 @@ export const getType = (type) => {
     return 'double';
   case 'boolean':
     return 'bool';
-  case 'array':
-    return 'std::vector<std::string>';
   case 'object':
     return '';
   case 'string':
     return 'String';
   }
+};
+
+/**
+ * Returns type for given schema
+ * 
+ * @param {object} schema 
+ * @returns type for given schema
+ */
+export const getSchemaType = (schema) => {
+  const primitiveTypes = ['integer', 'number', 'boolean', 'object', 'string'];
+
+  const { type } = schema;
+
+  if (primitiveTypes.includes(type)) {
+    return getPrimitiveType(type);
+  }
+
+  if (type === 'array') {
+    const itemsType = getPrimitiveType(schema.items.type);
+    return `std::vector<${itemsType}>`;
+  }
+
+  return type;
 };

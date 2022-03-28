@@ -1,4 +1,4 @@
-import { getType, renderFunction } from './common';
+import { getSchemaType, renderFunction } from './common';
 
 /**
  * Component for rendering subscribe channels
@@ -17,7 +17,7 @@ export function Subscribe({ channelName, channel, headerOnly }) {
   const getChannelParameters = (parameters) => {
     return Object.entries(parameters).map(([name, parameter]) => {
       const { schema, description } = parameter._json;
-      return { type: getType(schema.type), name: name, description: description };
+      return { type: getSchemaType(schema), name: name, description: description };
     }); 
   };
 
@@ -29,7 +29,7 @@ export function Subscribe({ channelName, channel, headerOnly }) {
    */
   const getPayloadParameters = (payload) => {
     return Object.entries(payload._json.properties).map(([name, parameter]) => {
-      return { type: getType(parameter.type), name: name, description: parameter.description };
+      return { type: getSchemaType(parameter), name: name, description: parameter.description };
     });
   };
 
@@ -77,7 +77,7 @@ for (JsonVariant i : ${parameter.name}Array) {
     return `/**String topic = "/${renerTopic(channelParameters)}";**/
 DynamicJsonDocument payloadDocument(1024);
 deserializeJson(payloadDocument, payload);
-${payloadParameters.map(renderPayloadParameter)}
+${payloadParameters.map(renderPayloadParameter).join('\n')}
 subscribeCallback(${payloadParameters.map(payloadParameter => payloadParameter.name)});`;
   };
 

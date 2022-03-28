@@ -8,6 +8,10 @@ import { Indent, IndentationTypes } from '@asyncapi/generator-react-sdk';
  * @returns rendered line with indent
  */
 export function IndendedLine({ size, children }) {
+  if (Array.isArray(children)) {
+    children = children.filter(child => !!child.trim());
+  }
+
   return (
     <>
       <Indent size={ size } type={ IndentationTypes.SPACES }>{ children }</Indent>

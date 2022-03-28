@@ -10,10 +10,11 @@ import { Includes } from './includes';
  */
 export function ApiClient({ asyncapi }) {
   const channels = asyncapi.channels();
+  const includes = ['<vector>', '<string>', '<sstream>', '<iostream>', '<ArduinoJson.h>', '<MQTTClient.h>'];
 
   return (
     <>
-      <Includes />
+      <Includes includes={ includes }/>
       <ListPublish channels={channels} headerOnly={ false }/>
       <ListSubscribe channels={channels} headerOnly={ false }/>
     </>
